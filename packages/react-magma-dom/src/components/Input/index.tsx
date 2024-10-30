@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { useIsInverse } from '../../inverse';
+import { omit, useGenerateId } from '../../utils';
 import {
   FormFieldContainer,
   FormFieldContainerBaseProps,
 } from '../FormFieldContainer';
 import { InputBase, InputBaseProps, InputSize } from '../InputBase';
-import { useGenerateId } from '../../utils';
-import { useIsInverse } from '../../inverse';
 
 export interface InputProps
   extends Omit<FormFieldContainerBaseProps, 'fieldId'>,
@@ -70,6 +70,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       setCharacterLength(0);
     }
 
+    const validInputBaseProps = omit(
+      [
+        'onDateChange',
+        'onInputChange',
+        'onInputBlur',
+        'onInputFocus',
+        'onClear',
+      ],
+      other
+    );
+
     return (
       <FormFieldContainer
         containerStyle={containerStyle}
@@ -92,7 +103,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         testId={testId && `${testId}-formFieldContainer`}
       >
         <InputBase
-          {...other}
+          {...validInputBaseProps}
           aria-describedby={
             descriptionId ? descriptionId : props['aria-describedby']
           }
