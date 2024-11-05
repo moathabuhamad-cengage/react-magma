@@ -8,13 +8,27 @@ on:
       - 'patch-*'
     types: [opened, edited, synchronize, reopened]
 jobs:
+  name: Analyze
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: sonarsource/sonarqube-scan-action@v3
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    - uses: sonarsource/sonarqube-quality-gate-action@master
+      timeout-minutes: 5
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   build:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
-      - name: Setup
-        uses: actions/setup-node@v2
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           check-latest: true
@@ -27,13 +41,13 @@ jobs:
       - name: Test
         run: npm test
       - name: Coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v4
       - name: Build Docs
         run: npm run build:docs
       - name: Build Storybook
         run: npm run build:storybook
-      - name: Deploy Doc Preview to Netlify
-        uses: nwtgck/actions-netlify@v1.1
+      - name: Deploy Documentation Preview to Netlify
+        uses: nwtgck/actions-netlify@v3.0
         with:
           publish-dir: './website/react-magma-docs/public'
           production-branch: main
